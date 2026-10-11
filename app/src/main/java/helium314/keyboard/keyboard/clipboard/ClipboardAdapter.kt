@@ -47,9 +47,10 @@ class ClipboardAdapter(
 
     inner class ViewHolder(
             view: View
-    ) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener, View.OnLongClickListener {
+    ) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener {
 
         private val pinnedIconView: ImageView
+        private val deleteIconView: ImageView
         private val contentTextView: TextView
         private val contentImageView: ImageView
 
@@ -57,14 +58,23 @@ class ClipboardAdapter(
             view.apply {
                 setOnClickListener(this@ViewHolder)
                 setOnTouchListener(this@ViewHolder)
-                setOnLongClickListener(this@ViewHolder)
                 setBackgroundResource(itemBackgroundId)
                 isHapticFeedbackEnabled = false
             }
             Settings.getValues().mColors.setBackground(view, ColorType.KEY_BACKGROUND)
             pinnedIconView = view.findViewById<ImageView>(R.id.clipboard_entry_pinned_icon).apply {
-                visibility = View.GONE
                 setImageResource(pinnedIconResId)
+                setOnClickListener {
+                    val id = itemView.tag as? Long ?: return@setOnClickListener
+                    clipboardHistoryManager?.toggleClipPinned(id)
+                }
+            }
+            deleteIconView = view.findViewById<ImageView>(R.id.clipboard_entry_delete_icon).apply {
+                setOnClickListener {
+                    val position = bindingAdapterPosition
+                    if (position != RecyclerView.NO_POSITION)
+                        clipboardHistoryManager?.removeEntry(position)
+                }
             }
             contentTextView = view.findViewById<TextView>(R.id.clipboard_entry_text_content).apply {
                 typeface = itemTypeFace
@@ -75,6 +85,7 @@ class ClipboardAdapter(
             clipboardLayoutParams.setItemProperties(view)
             val colors = Settings.getValues().mColors
             colors.setColor(pinnedIconView, ColorType.CLIPBOARD_PIN)
+            colors.setColor(deleteIconView, ColorType.CLIPBOARD_PIN)
         }
 
         fun setContent(historyEntry: ClipboardHistoryEntry?) {
@@ -85,7 +96,8 @@ class ClipboardAdapter(
             } else {
                 contentTextView.text = historyEntry.text?.take(1000) // truncate displayed text for performance reasons
             }
-            pinnedIconView.visibility = if (historyEntry.isPinned) View.VISIBLE else View.GONE
+            pinnedIconView.alpha = if (historyEntry.isPinned) 1f else 0.35f
+            deleteIconView.visibility = if (historyEntry.isPinned) View.INVISIBLE else View.VISIBLE
             contentImageView.visibility = if (historyEntry.filename != null) View.VISIBLE else View.GONE
             contentTextView.visibility = if (contentTextView.text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
@@ -100,11 +112,6 @@ class ClipboardAdapter(
 
         override fun onClick(view: View) {
             keyEventListener.onKeyUp(view.tag as Long)
-        }
-
-        override fun onLongClick(view: View): Boolean {
-            clipboardHistoryManager?.toggleClipPinned(view.tag as Long)
-            return true
         }
     }
 }
