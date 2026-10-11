@@ -114,10 +114,18 @@ public final class InputView extends FrameLayout {
             frame.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             videoView.setVisibility(View.VISIBLE);
             videoView.setVideoFile(videoFile);
+            final android.view.ViewGroup.LayoutParams lp = videoView.getLayoutParams();
+            lp.width = mMainKeyboardView.getWidth();
+            lp.height = mMainKeyboardView.getHeight();
+            videoView.setLayoutParams(lp);
         } else {
             if (videoView != null) {
                 videoView.setVisibility(View.GONE);
                 videoView.setVideoFile(null);
+                final android.view.ViewGroup.LayoutParams lp = videoView.getLayoutParams();
+                lp.width = 0;
+                lp.height = 0;
+                videoView.setLayoutParams(lp);
             }
             Settings.getValues().mColors.setBackground(frame, ColorType.MAIN_BACKGROUND);
         }
