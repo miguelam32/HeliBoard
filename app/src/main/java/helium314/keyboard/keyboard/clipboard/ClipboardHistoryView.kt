@@ -120,7 +120,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
             setImageResource(pinIconId)
             contentDescription = context.getString(R.string.clipboard_history_pinned_first)
             isHapticFeedbackEnabled = false
-            soundEffectsEnabled = false
+            setSoundEffectsEnabled(false)
             setOnClickListener {
                 clipboardHistoryManager.toggleAllPinned()
                 clipboardAdapter.notifyDataSetChanged()
