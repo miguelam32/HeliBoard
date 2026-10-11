@@ -47,6 +47,7 @@ class ClipboardAdapter(
 
     override fun getItemCount() = clipboardHistoryManager?.getHistorySize() ?: 0
 
+    // para fijados: pide confirmación dos veces antes de borrar
     private fun confirmAndDelete(position: Int, view: View) {
         val ctx = getPlatformDialogThemeContext(view.context)
         AlertDialog.Builder(ctx)
@@ -58,7 +59,7 @@ class ClipboardAdapter(
                     .setMessage(R.string.clipboard_delete_confirm_final)
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(R.string.delete) { _, _ ->
-                        clipboardHistoryManager?.removeEntry(position)
+                        clipboardHistoryManager?.forceRemoveEntry(position)
                     }
                     .show()
             }
@@ -70,9 +71,10 @@ class ClipboardAdapter(
     ) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnTouchListener {
 
         private val pinnedIconView: ImageView
-        private val deleteIconView: ImageView
+        private val deleteIconView: TextView
         private val contentTextView: TextView
         private val contentImageView: ImageView
+        private var isPinned = false
 
         init {
             view.apply {
@@ -89,11 +91,17 @@ class ClipboardAdapter(
                     clipboardHistoryManager?.toggleClipPinned(id)
                 }
             }
-            deleteIconView = view.findViewById<ImageView>(R.id.clipboard_entry_delete_icon).apply {
+            deleteIconView = view.findViewById<TextView>(R.id.clipboard_entry_delete_icon).apply {
                 setOnClickListener {
                     val position = bindingAdapterPosition
-                    if (position != RecyclerView.NO_POSITION)
+                    if (position == RecyclerView.NO_POSITION) return@setOnClickListener
+                    if (isPinned) {
+                        // fijado: no se borra de frente, se pide confirmación dos veces
                         confirmAndDelete(position, it)
+                    } else {
+                        // sin fijar: se borra directo
+                        clipboardHistoryManager?.removeEntry(position)
+                    }
                 }
             }
             contentTextView = view.findViewById<TextView>(R.id.clipboard_entry_text_content).apply {
@@ -107,19 +115,20 @@ class ClipboardAdapter(
             clipboardLayoutParams.setItemProperties(view)
             val colors = Settings.getValues().mColors
             colors.setColor(pinnedIconView, ColorType.CLIPBOARD_PIN)
-            colors.setColor(deleteIconView, ColorType.CLIPBOARD_PIN)
+            deleteIconView.setTextColor(colors.get(ColorType.CLIPBOARD_PIN))
         }
 
         fun setContent(historyEntry: ClipboardHistoryEntry?) {
             if (historyEntry == null) return
             itemView.tag = historyEntry.id
+            isPinned = historyEntry.isPinned
             if (historyEntry.filename != null) {
                 historyEntry.setImageAndDescription(contentImageView, contentTextView)
             } else {
                 contentTextView.text = historyEntry.text?.take(1000) // truncate displayed text for performance reasons
             }
-            pinnedIconView.alpha = if (historyEntry.isPinned) 1f else 0.35f
-            deleteIconView.visibility = if (historyEntry.isPinned) View.INVISIBLE else View.VISIBLE
+            pinnedIconView.alpha = if (isPinned) 1f else 0.35f
+            deleteIconView.visibility = View.VISIBLE
             contentImageView.visibility = if (historyEntry.filename != null) View.VISIBLE else View.GONE
             contentTextView.visibility = if (contentTextView.text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }

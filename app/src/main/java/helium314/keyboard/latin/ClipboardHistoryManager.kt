@@ -146,6 +146,10 @@ class ClipboardHistoryManager(
         clipboardDao?.toggleAllPinned()
     }
 
+    fun forceRemoveEntry(index: Int) {
+        clipboardDao?.deleteClipAt(index)
+    }
+
     fun clearHistory() {
         clipboardDao?.clearNonPinned()
         ClipboardManagerCompat.clearPrimaryClip(clipboardManager)
