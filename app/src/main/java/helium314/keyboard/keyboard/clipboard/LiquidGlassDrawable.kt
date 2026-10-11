@@ -40,6 +40,10 @@ class LiquidGlassDrawable(
     private val rowLoc = IntArray(2)
     private val videoLoc = IntArray(2)
 
+    init {
+        source.register(this)
+    }
+
     override fun onBoundsChange(bounds: Rect) {
         super.onBoundsChange(bounds)
         rect.set(1f, 1f, bounds.width() - 1f, bounds.height() - 1f)

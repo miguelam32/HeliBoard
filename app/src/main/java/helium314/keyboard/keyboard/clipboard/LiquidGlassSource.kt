@@ -26,11 +26,19 @@ class LiquidGlassSource(private val onFrame: () -> Unit) {
     private var videoView: VideoBackgroundView? = null
     private var running = false
     private var phase = 0f
+    private val drawables = mutableSetOf<LiquidGlassDrawable>()
+
+    fun register(drawable: LiquidGlassDrawable) {
+        drawables.add(drawable)
+    }
 
     private val tick = object : Runnable {
         override fun run() {
             captureFrame()
             phase += 0.35f
+            // invalidar cada fila directamente: con render acelerado por hardware,
+            // invalidar solo el RecyclerView padre no fuerza a sus hijas a redibujarse
+            drawables.forEach { it.invalidateSelf() }
             onFrame()
             if (running) handler.postDelayed(this, TICK_MS)
         }
