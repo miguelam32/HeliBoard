@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -133,7 +132,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
         KeyboardTypeface.applyToTextView(headerTitle)
         headerTitle.setTextColor(colors.get(ColorType.KEY_TEXT))
 
-        val backContainer = findViewById<FrameLayout>(R.id.clipboard_header_back_container)
+        val backContainer = findViewById<LinearLayout>(R.id.clipboard_header_back_container)
         backButton = toolbarKeys[0]
         backContainer.addView(backButton)
         backButton.setOnClickListener(this@ClipboardHistoryView)
@@ -141,7 +140,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
         colors.setColor(backButton, ColorType.TOOL_BAR_KEY)
         colors.setBackground(backButton, ColorType.STRIP_BACKGROUND)
 
-        val pinAllContainer = findViewById<FrameLayout>(R.id.clipboard_header_pin_all_container)
+        val pinAllContainer = findViewById<LinearLayout>(R.id.clipboard_header_pin_all_container)
         pinAllButton = ImageButton(context, null, R.attr.suggestionWordStyle).apply {
             setImageResource(pinIconId)
             contentDescription = context.getString(R.string.clipboard_history_pinned_first)
