@@ -26,8 +26,8 @@ class VideoBackgroundView @JvmOverloads constructor(
 
     private var mediaPlayer: MediaPlayer? = null
     private var pendingFile: File? = null
-    private var videoWidth = 0
-    private var videoHeight = 0
+    private var srcVideoWidth = 0
+    private var srcVideoHeight = 0
 
     init {
         isOpaque = false
@@ -58,8 +58,8 @@ class VideoBackgroundView @JvmOverloads constructor(
                 isLooping = true
                 setVolume(0f, 0f)
                 setOnVideoSizeChangedListener { _, w, h ->
-                    videoWidth = w
-                    videoHeight = h
+                    srcVideoWidth = w
+                    srcVideoHeight = h
                     applyCenterCropTransform()
                 }
                 setOnPreparedListener { it.start() }
@@ -79,14 +79,14 @@ class VideoBackgroundView @JvmOverloads constructor(
             release()
         }
         mediaPlayer = null
-        videoWidth = 0
-        videoHeight = 0
+        srcVideoWidth = 0
+        srcVideoHeight = 0
     }
 
     /** Escala el contenido del video para que cubra toda la vista sin deformarse (equivalente a object-fit: cover). */
     private fun applyCenterCropTransform() {
-        val vw = videoWidth
-        val vh = videoHeight
+        val vw = srcVideoWidth
+        val vh = srcVideoHeight
         val w = width
         val h = height
         if (vw <= 0 || vh <= 0 || w <= 0 || h <= 0) return
