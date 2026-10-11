@@ -2,17 +2,21 @@
 package helium314.keyboard.latin
 
 import android.content.Context
+import android.graphics.Matrix
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.util.AttributeSet
 import android.view.Surface
 import android.view.TextureView
 import java.io.File
+import kotlin.math.max
 
 /**
  * Reproduce un video en loop, sin audio, como fondo del teclado.
  * Se coloca como la vista de MÁS ABAJO (primer hijo) dentro de un FrameLayout
  * para que las teclas (transparentes) se dibujen encima.
+ * Aplica un escalado tipo "center-crop": el video siempre cubre todo el
+ * área sin deformarse, sea cual sea su proporción (horizontal, vertical, cuadrado).
  */
 class VideoBackgroundView @JvmOverloads constructor(
     context: Context,
@@ -22,6 +26,8 @@ class VideoBackgroundView @JvmOverloads constructor(
 
     private var mediaPlayer: MediaPlayer? = null
     private var pendingFile: File? = null
+    private var videoWidth = 0
+    private var videoHeight = 0
 
     init {
         isOpaque = false
@@ -51,8 +57,13 @@ class VideoBackgroundView @JvmOverloads constructor(
                 setSurface(surface)
                 isLooping = true
                 setVolume(0f, 0f)
+                setOnVideoSizeChangedListener { _, w, h ->
+                    videoWidth = w
+                    videoHeight = h
+                    applyCenterCropTransform()
+                }
                 setOnPreparedListener { it.start() }
-                setOnErrorListener { _, _, _ -> true }
+                setOnErrorListener { _, _, _ -> true } // evitar crash si el archivo es inválido
                 prepareAsync()
             }
         } catch (_: Exception) {
@@ -68,13 +79,45 @@ class VideoBackgroundView @JvmOverloads constructor(
             release()
         }
         mediaPlayer = null
+        videoWidth = 0
+        videoHeight = 0
+    }
+
+    /** Escala el contenido del video para que cubra toda la vista sin deformarse (equivalente a object-fit: cover). */
+    private fun applyCenterCropTransform() {
+        val vw = videoWidth
+        val vh = videoHeight
+        val w = width
+        val h = height
+        if (vw <= 0 || vh <= 0 || w <= 0 || h <= 0) return
+
+        // Por defecto TextureView estira el buffer del video para llenar exactamente
+        // width x height (deformando la proporción). Calculamos un factor extra de
+        // escalado, por encima de ese estiramiento por defecto, para que el video
+        // quede escalado de forma UNIFORME y cubra toda la vista sin deformarse.
+        val defaultFactorX = w.toFloat() / vw
+        val defaultFactorY = h.toFloat() / vh
+        val uniformFactor = max(defaultFactorX, defaultFactorY)
+        val extraScaleX = uniformFactor / defaultFactorX
+        val extraScaleY = uniformFactor / defaultFactorY
+
+        val matrix = Matrix()
+        matrix.setScale(extraScaleX, extraScaleY, w / 2f, h / 2f)
+        setTransform(matrix)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        applyCenterCropTransform()
     }
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
         pendingFile?.let { startPlayback(it) }
     }
 
-    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {}
+    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+        applyCenterCropTransform()
+    }
 
     override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
         releasePlayer()
