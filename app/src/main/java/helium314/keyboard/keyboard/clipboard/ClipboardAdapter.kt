@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -47,23 +48,40 @@ class ClipboardAdapter(
 
     override fun getItemCount() = clipboardHistoryManager?.getHistorySize() ?: 0
 
+    // un AlertDialog normal no se puede mostrar desde un IME sin fijar el window token y tipo de ventana
+    private fun showImeDialog(builder: AlertDialog.Builder, anchor: View): AlertDialog {
+        val dialog = builder.create()
+        val window = dialog.window
+        val layoutParams = window?.attributes
+        layoutParams?.token = anchor.windowToken
+        layoutParams?.type = WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG
+        window?.attributes = layoutParams
+        window?.addFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+        dialog.show()
+        return dialog
+    }
+
     // para fijados: pide confirmación dos veces antes de borrar
     private fun confirmAndDelete(position: Int, view: View) {
         val ctx = getPlatformDialogThemeContext(view.context)
-        AlertDialog.Builder(ctx)
-            .setTitle(R.string.clipboard_delete_confirm_title)
-            .setMessage(R.string.clipboard_delete_confirm_message)
-            .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.delete) { _, _ ->
-                AlertDialog.Builder(ctx)
-                    .setMessage(R.string.clipboard_delete_confirm_final)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(R.string.delete) { _, _ ->
-                        clipboardHistoryManager?.forceRemoveEntry(position)
-                    }
-                    .show()
-            }
-            .show()
+        showImeDialog(
+            AlertDialog.Builder(ctx)
+                .setTitle(R.string.clipboard_delete_confirm_title)
+                .setMessage(R.string.clipboard_delete_confirm_message)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.delete) { _, _ ->
+                    showImeDialog(
+                        AlertDialog.Builder(ctx)
+                            .setMessage(R.string.clipboard_delete_confirm_final)
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .setPositiveButton(R.string.delete) { _, _ ->
+                                clipboardHistoryManager?.forceRemoveEntry(position)
+                            },
+                        view
+                    )
+                },
+            view
+        )
     }
 
     inner class ViewHolder(
