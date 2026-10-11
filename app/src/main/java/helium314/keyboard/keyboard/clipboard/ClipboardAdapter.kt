@@ -76,6 +76,7 @@ class ClipboardAdapter(
                             .setNegativeButton(android.R.string.cancel, null)
                             .setPositiveButton(R.string.delete) { _, _ ->
                                 clipboardHistoryManager?.forceRemoveEntry(position)
+                                notifyItemRemoved(position)
                             },
                         view
                     )
@@ -119,6 +120,7 @@ class ClipboardAdapter(
                     } else {
                         // sin fijar: se borra directo
                         clipboardHistoryManager?.removeEntry(position)
+                        notifyItemRemoved(position)
                     }
                 }
             }
