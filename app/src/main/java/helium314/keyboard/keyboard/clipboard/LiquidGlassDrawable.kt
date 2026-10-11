@@ -27,7 +27,7 @@ class LiquidGlassDrawable(
 ) : Drawable() {
 
     private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
-    private val tintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x22FFFFFF }
+    private val tintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x14FFFFFF }
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0x4DFFFFFF
         style = Paint.Style.STROKE
@@ -60,11 +60,11 @@ class LiquidGlassDrawable(
             val relTop = ((rowLoc[1] - videoLoc[1]) * scaleY).toInt()
             val w = (bounds.width() * scaleX).toInt().coerceAtLeast(1)
             val h = (bounds.height() * scaleY).toInt().coerceAtLeast(1)
-            srcRect.set(relLeft, relTop, relLeft + w, relTop + h)
-            if (srcRect.left < 0) srcRect.offset(-srcRect.left, 0)
-            if (srcRect.top < 0) srcRect.offset(0, -srcRect.top)
-            if (srcRect.right > frame.width) srcRect.offset(frame.width - srcRect.right, 0)
-            if (srcRect.bottom > frame.height) srcRect.offset(0, frame.height - srcRect.bottom)
+            val clampedW = w.coerceAtMost(frame.width)
+            val clampedH = h.coerceAtMost(frame.height)
+            val clampedLeft = relLeft.coerceIn(0, (frame.width - clampedW).coerceAtLeast(0))
+            val clampedTop = relTop.coerceIn(0, (frame.height - clampedH).coerceAtLeast(0))
+            srcRect.set(clampedLeft, clampedTop, clampedLeft + clampedW, clampedTop + clampedH)
             if (srcRect.left >= 0 && srcRect.top >= 0 && srcRect.width() > 0 && srcRect.height() > 0) {
                 val saveCount = canvas.save()
                 canvas.clipPath(clipPath)

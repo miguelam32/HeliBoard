@@ -128,6 +128,9 @@ class ClipboardHistoryView @JvmOverloads constructor(
         placeholderView = findViewById(R.id.clipboard_empty_view)
         clipboardRecyclerView = findViewById<ClipboardHistoryRecyclerView>(R.id.clipboard_list).apply {
             layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
+            // sin animador: evita que Android "congele" el fondo de cristal liquido en una
+            // capa de hardware durante la animacion de borrado
+            itemAnimator = null
             @Suppress("deprecation") // "no cache" should be fine according to warning in https://developer.android.com/reference/android/view/ViewGroup#setPersistentDrawingCache(int)
             persistentDrawingCache = PERSISTENT_NO_CACHE
             clipboardLayoutParams.setListProperties(this)

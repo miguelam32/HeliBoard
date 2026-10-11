@@ -15,7 +15,7 @@ import kotlin.math.max
  */
 class LiquidGlassSource(private val onFrame: () -> Unit) {
     companion object {
-        private const val DOWNSCALE = 6
+        private const val DOWNSCALE = 3
         private const val TICK_MS = 90L
     }
 
@@ -68,7 +68,7 @@ class LiquidGlassSource(private val onFrame: () -> Unit) {
     // y es mucho más liviano que un blur de verdad por pixel en CPU
     private fun boxBlurBySubsampling(src: Bitmap): Bitmap {
         var bmp = src
-        repeat(2) {
+        repeat(1) {
             val w = max(1, bmp.width / 2)
             val h = max(1, bmp.height / 2)
             val down = Bitmap.createScaledBitmap(bmp, w, h, true)
