@@ -520,6 +520,10 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
         return new File(DeviceProtectedUtils.getFilesDir(context), "custom_background_image" + (landscape ? "_landscape" : "") + (night ? "_night" : ""));
     }
 
+    public static File getCustomBackgroundVideoFile(final Context context) {
+        return new File(DeviceProtectedUtils.getFilesDir(context), "custom_background_video");
+    }
+
     public static void clearCachedBackgroundImages() {
         Arrays.fill(sCachedBackgroundImages, null);
     }

@@ -107,7 +107,20 @@ public final class InputView extends FrameLayout {
     }
 
     private Unit onNextLayout(View v) {
-        Settings.getValues().mColors.setBackground(findViewById(R.id.main_keyboard_frame), ColorType.MAIN_BACKGROUND);
+        final View frame = findViewById(R.id.main_keyboard_frame);
+        final java.io.File videoFile = Settings.getCustomBackgroundVideoFile(getContext());
+        final VideoBackgroundView videoView = findViewById(R.id.keyboard_video_background);
+        if (videoFile.isFile() && videoView != null) {
+            frame.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            videoView.setVisibility(View.VISIBLE);
+            videoView.setVideoFile(videoFile);
+        } else {
+            if (videoView != null) {
+                videoView.setVisibility(View.GONE);
+                videoView.setVideoFile(null);
+            }
+            Settings.getValues().mColors.setBackground(frame, ColorType.MAIN_BACKGROUND);
+        }
 
         // Work around inset application being unreliable
         requestApplyInsets();

@@ -24,6 +24,12 @@
         android:layout_height="wrap_content"
         android:layoutDirection="ltr" >
 
+        <helium314.keyboard.latin.VideoBackgroundView
+            android:id="@+id/keyboard_video_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
         <helium314.keyboard.keyboard.MainKeyboardView
             android:id="@+id/keyboard_view"
             android:layoutDirection="ltr"
