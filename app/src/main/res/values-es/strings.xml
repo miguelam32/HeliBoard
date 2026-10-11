@@ -549,4 +549,8 @@
     <string name="show_dpad_key">Botón de la cruceta</string>
     <string name="recent_emojis_cleared">Borrados los emojis recientes</string>
     <string name="prefs_enable_hardware_keyboard">Compatibilidad con teclado físico</string>
+    <string name="clipboard_history_title">Portapapeles</string>
+    <string name="clipboard_delete_confirm_title">¿Eliminar este elemento?</string>
+    <string name="clipboard_delete_confirm_message">Se quitará de tu historial del portapapeles.</string>
+    <string name="clipboard_delete_confirm_final">¿Estás seguro? Esto no se puede deshacer.</string>
 </resources>

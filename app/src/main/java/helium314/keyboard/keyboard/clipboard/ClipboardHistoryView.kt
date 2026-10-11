@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -33,10 +34,8 @@ import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.ResourceUtils
 import helium314.keyboard.latin.utils.ToolbarKey
 import helium314.keyboard.latin.utils.createToolbarKey
-import helium314.keyboard.latin.utils.getEnabledClipboardToolbarKeys
 import helium314.keyboard.latin.utils.onClickToolbarKey
 import helium314.keyboard.latin.utils.onLongClickToolbarKey
-import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.latin.utils.setToolbarButtonsActivatedStateOnPrefChange
 
 @SuppressLint("CustomViewStyleable")
@@ -54,6 +53,9 @@ class ClipboardHistoryView @JvmOverloads constructor(
 
     private lateinit var clipboardRecyclerView: ClipboardHistoryRecyclerView
     private lateinit var placeholderView: TextView
+    private lateinit var headerTitle: TextView
+    private lateinit var backButton: ImageButton
+    private lateinit var pinAllButton: ImageButton
     private val toolbarKeys = mutableListOf<ImageButton>()
     private lateinit var clipboardAdapter: ClipboardAdapter
 
@@ -69,8 +71,8 @@ class ClipboardHistoryView @JvmOverloads constructor(
         val keyboardViewAttr = context.obtainStyledAttributes(attrs, R.styleable.KeyboardView, defStyle, R.style.KeyboardView)
         keyBackgroundId = keyboardViewAttr.getResourceId(R.styleable.KeyboardView_keyBackground, 0)
         keyboardViewAttr.recycle()
-        getEnabledClipboardToolbarKeys(context.prefs())
-            .forEach { toolbarKeys.add(createToolbarKey(context, it)) }
+        // sólo queremos el botón de regresar en el toolbar key framework; el resto lo maneja el header propio
+        toolbarKeys.add(createToolbarKey(context, ToolbarKey.CLOSE_HISTORY))
         fitsSystemWindows = true
     }
 
@@ -93,21 +95,40 @@ class ClipboardHistoryView @JvmOverloads constructor(
         }
         placeholderView = findViewById(R.id.clipboard_empty_view)
         clipboardRecyclerView = findViewById<ClipboardHistoryRecyclerView>(R.id.clipboard_list).apply {
-            val colCount = resources.getInteger(R.integer.config_clipboard_keyboard_col_count)
-            layoutManager = StaggeredGridLayoutManager(colCount, StaggeredGridLayoutManager.VERTICAL)
+            layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
             @Suppress("deprecation") // "no cache" should be fine according to warning in https://developer.android.com/reference/android/view/ViewGroup#setPersistentDrawingCache(int)
             persistentDrawingCache = PERSISTENT_NO_CACHE
             clipboardLayoutParams.setListProperties(this)
             placeholderView = this@ClipboardHistoryView.placeholderView
         }
-        val clipboardStrip = KeyboardSwitcher.getInstance().clipboardStrip
-        toolbarKeys.forEach {
-            clipboardStrip.addView(it)
-            it.setOnClickListener(this@ClipboardHistoryView)
-            it.setOnLongClickListener(this@ClipboardHistoryView)
-            colors.setColor(it, ColorType.TOOL_BAR_KEY)
-            colors.setBackground(it, ColorType.STRIP_BACKGROUND)
+
+        headerTitle = findViewById(R.id.clipboard_header_title)
+        headerTitle.text = context.getString(R.string.clipboard_history_title)
+        KeyboardTypeface.applyToTextView(headerTitle)
+        headerTitle.setTextColor(colors.get(ColorType.KEY_TEXT))
+
+        val backContainer = findViewById<FrameLayout>(R.id.clipboard_header_back_container)
+        backButton = toolbarKeys[0]
+        backContainer.addView(backButton)
+        backButton.setOnClickListener(this@ClipboardHistoryView)
+        backButton.setOnLongClickListener(this@ClipboardHistoryView)
+        colors.setColor(backButton, ColorType.TOOL_BAR_KEY)
+        colors.setBackground(backButton, ColorType.STRIP_BACKGROUND)
+
+        val pinAllContainer = findViewById<FrameLayout>(R.id.clipboard_header_pin_all_container)
+        pinAllButton = ImageButton(context, null, R.attr.suggestionWordStyle).apply {
+            setImageResource(pinIconId)
+            contentDescription = context.getString(R.string.clipboard_history_pinned_first)
+            isHapticFeedbackEnabled = false
+            soundEffectsEnabled = false
+            setOnClickListener {
+                clipboardHistoryManager.toggleAllPinned()
+                clipboardAdapter.notifyDataSetChanged()
+            }
         }
+        pinAllContainer.addView(pinAllButton)
+        colors.setColor(pinAllButton, ColorType.CLIPBOARD_PIN)
+        colors.setBackground(pinAllButton, ColorType.STRIP_BACKGROUND)
     }
 
     private fun setupClipKey(params: KeyDrawParams) {
@@ -115,14 +136,15 @@ class ClipboardHistoryView @JvmOverloads constructor(
             itemBackgroundId = keyBackgroundId
             itemTypeFace = params.mTypeface
             itemTextColor = params.mTextColor
-            itemTextSize = params.mLabelSize.toFloat()
+            itemTextSize = params.mLabelSize.toFloat() * 0.65f
         }
     }
 
     private fun setupToolbarKeys() {
         // set layout params
         val toolbarKeyLayoutParams = LayoutParams(resources.getDimensionPixelSize(R.dimen.config_suggestions_strip_edge_key_width), LayoutParams.MATCH_PARENT)
-        toolbarKeys.forEach { it.layoutParams = toolbarKeyLayoutParams }
+        backButton.layoutParams = toolbarKeyLayoutParams
+        pinAllButton.layoutParams = LayoutParams(resources.getDimensionPixelSize(R.dimen.config_suggestions_strip_edge_key_width), LayoutParams.MATCH_PARENT)
     }
 
     private fun setupBottomRowKeyboard(editorInfo: EditorInfo, listener: KeyboardActionListener) {
@@ -186,7 +208,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
         }
 
         // absurd workaround so Android sets the correct color from stateList (depending on "activated")
-        toolbarKeys.forEach { it.isEnabled = false; it.isEnabled = true }
+        backButton.isEnabled = false; backButton.isEnabled = true
     }
 
     fun stopClipboardHistory() {
@@ -243,8 +265,6 @@ class ClipboardHistoryView @JvmOverloads constructor(
     }
 
     override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
-        setToolbarButtonsActivatedStateOnPrefChange(KeyboardSwitcher.getInstance().clipboardStrip, key)
-
         // The setting can only be changed from a settings screen, but adding it to this listener seems necessary: https://github.com/HeliBorg/HeliBoard/pull/1903#issuecomment-3478424606
         if (::clipboardHistoryManager.isInitialized && key == Settings.PREF_CLIPBOARD_HISTORY_PINNED_FIRST) {
             // Ensure settings are reloaded first

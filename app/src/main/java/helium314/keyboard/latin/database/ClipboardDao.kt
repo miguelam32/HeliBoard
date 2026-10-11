@@ -175,6 +175,21 @@ class ClipboardDao private constructor(private val db: Database) {
         db.writableDatabase.update(TABLE, cv, "$COLUMN_ID = ${entry.id}", null)
     }
 
+    fun toggleAllPinned() = synchronized(this) {
+        if (cache.isEmpty()) return@synchronized
+        val pinAll = cache.any { !it.isPinned }
+        val now = System.currentTimeMillis()
+        cache.forEach { entry ->
+            entry.isPinned = pinAll
+            entry.timeStamp = now
+            val cv = ContentValues(2)
+            cv.put(COLUMN_PINNED, entry.isPinned)
+            cv.put(COLUMN_TIMESTAMP, entry.timeStamp)
+            db.writableDatabase.update(TABLE, cv, "$COLUMN_ID = ${entry.id}", null)
+        }
+        cache.sort()
+    }
+
     // RecyclerView initiates this, so we don't call listener (or we'll get an IndexOutOfRangeException from RecyclerView)
     fun deleteClipAt(index: Int) {
         delete(listOf(cache[index]))

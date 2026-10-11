@@ -3,6 +3,7 @@
 package helium314.keyboard.keyboard.clipboard
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.graphics.Typeface
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -17,6 +18,7 @@ import helium314.keyboard.latin.ClipboardHistoryManager
 import helium314.keyboard.latin.R
 import helium314.keyboard.latin.common.ColorType
 import helium314.keyboard.latin.settings.Settings
+import helium314.keyboard.latin.utils.getPlatformDialogThemeContext
 
 class ClipboardAdapter(
        val clipboardLayoutParams: ClipboardLayoutParams,
@@ -44,6 +46,24 @@ class ClipboardAdapter(
     private fun getItem(position: Int) = clipboardHistoryManager?.getHistoryEntry(position)
 
     override fun getItemCount() = clipboardHistoryManager?.getHistorySize() ?: 0
+
+    private fun confirmAndDelete(position: Int, view: View) {
+        val ctx = getPlatformDialogThemeContext(view.context)
+        AlertDialog.Builder(ctx)
+            .setTitle(R.string.clipboard_delete_confirm_title)
+            .setMessage(R.string.clipboard_delete_confirm_message)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                AlertDialog.Builder(ctx)
+                    .setMessage(R.string.clipboard_delete_confirm_final)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(R.string.delete) { _, _ ->
+                        clipboardHistoryManager?.removeEntry(position)
+                    }
+                    .show()
+            }
+            .show()
+    }
 
     inner class ViewHolder(
             view: View
@@ -73,13 +93,15 @@ class ClipboardAdapter(
                 setOnClickListener {
                     val position = bindingAdapterPosition
                     if (position != RecyclerView.NO_POSITION)
-                        clipboardHistoryManager?.removeEntry(position)
+                        confirmAndDelete(position, it)
                 }
             }
             contentTextView = view.findViewById<TextView>(R.id.clipboard_entry_text_content).apply {
                 typeface = itemTypeFace
                 setTextColor(itemTextColor)
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, itemTextSize)
+                maxLines = 1
+                isSingleLine = true
             }
             contentImageView = view.findViewById(R.id.clipboard_entry_image_content)
             clipboardLayoutParams.setItemProperties(view)
