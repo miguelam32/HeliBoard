@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import helium314.keyboard.latin.VideoBackgroundView
 import kotlin.math.sin
+import kotlin.math.cos
 
 /**
  * Dibuja, para UNA fila, el pedazo de video que le corresponde según su
@@ -72,9 +73,13 @@ class LiquidGlassDrawable(
             if (srcRect.left >= 0 && srcRect.top >= 0 && srcRect.width() > 0 && srcRect.height() > 0) {
                 val saveCount = canvas.save()
                 canvas.clipPath(clipPath)
-                // leve onda de "cristal líquido": desplaza el recorte verticalmente con el tiempo
-                val wave = (sin(source.wavePhase() + rect.centerX() * 0.015f) * 4f).toInt()
-                dstRect.set(0, wave, bounds.width(), bounds.height() + wave)
+                // onda tipo cristal líquido: combinación de ondas vertical + horizontal,
+                // con una fase propia por fila (según su posición) para que no se muevan al unísono
+                val rowPhaseOffset = ownerView.top * 0.03f
+                val t = source.wavePhase() + rowPhaseOffset
+                val waveY = (sin(t) * 7f).toInt()
+                val waveX = (cos(t * 0.7f) * 5f).toInt()
+                dstRect.set(waveX, waveY, bounds.width() + waveX, bounds.height() + waveY)
                 canvas.drawBitmap(frame, srcRect, dstRect, bitmapPaint)
                 canvas.restoreToCount(saveCount)
             }
