@@ -57,6 +57,10 @@ class ClipboardHistoryView @JvmOverloads constructor(
     private lateinit var pinAllButton: ImageButton
     private val toolbarKeys = mutableListOf<ImageButton>()
     private lateinit var clipboardAdapter: ClipboardAdapter
+    private var videoBackgroundView: helium314.keyboard.latin.VideoBackgroundView? = null
+    private val liquidGlassSource = LiquidGlassSource {
+        if (this::clipboardRecyclerView.isInitialized) clipboardRecyclerView.invalidate()
+    }
 
     lateinit var keyboardActionListener: KeyboardActionListener
     private lateinit var clipboardHistoryManager: ClipboardHistoryManager
@@ -114,9 +118,12 @@ class ClipboardHistoryView @JvmOverloads constructor(
     private fun initializeInner() {
         if (this::clipboardAdapter.isInitialized) return
         val colors = Settings.getValues().mColors
+        videoBackgroundView = (parent as? android.view.View)?.findViewById(R.id.keyboard_video_background)
         clipboardAdapter = ClipboardAdapter(clipboardLayoutParams, this).apply {
             itemBackgroundId = keyBackgroundId
             pinnedIconResId = pinIconId
+            videoBackgroundView = this@ClipboardHistoryView.videoBackgroundView
+            liquidGlassSource = this@ClipboardHistoryView.liquidGlassSource
         }
         placeholderView = findViewById(R.id.clipboard_empty_view)
         clipboardRecyclerView = findViewById<ClipboardHistoryRecyclerView>(R.id.clipboard_list).apply {
@@ -234,11 +241,14 @@ class ClipboardHistoryView @JvmOverloads constructor(
             setPadding(leftPadding, paddingTop, rightPadding, paddingBottom)
         }
 
+        liquidGlassSource.start(videoBackgroundView)
+
         // absurd workaround so Android sets the correct color from stateList (depending on "activated")
         backButton.isEnabled = false; backButton.isEnabled = true
     }
 
     fun stopClipboardHistory() {
+        liquidGlassSource.stop()
         if (!this::clipboardAdapter.isInitialized) return
         clipboardRecyclerView.adapter = null
         clipboardHistoryManager.setHistoryChangeListener(null)

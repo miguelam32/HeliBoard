@@ -20,6 +20,7 @@ import helium314.keyboard.latin.R
 import helium314.keyboard.latin.common.ColorType
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.getPlatformDialogThemeContext
+import helium314.keyboard.latin.VideoBackgroundView
 
 class ClipboardAdapter(
        val clipboardLayoutParams: ClipboardLayoutParams,
@@ -27,6 +28,8 @@ class ClipboardAdapter(
 ) : RecyclerView.Adapter<ClipboardAdapter.ViewHolder>() {
 
     var clipboardHistoryManager: ClipboardHistoryManager? = null
+    var videoBackgroundView: VideoBackgroundView? = null
+    var liquidGlassSource: LiquidGlassSource? = null
 
     var pinnedIconResId = 0
     var itemBackgroundId = 0
@@ -103,7 +106,13 @@ class ClipboardAdapter(
                 isHapticFeedbackEnabled = false
             }
             Settings.getValues().mColors.setBackground(view, ColorType.KEY_BACKGROUND)
-            view.background = GlassCardDrawable(8f * view.resources.displayMetrics.density)
+            val cornerPx = 8f * view.resources.displayMetrics.density
+            val video = videoBackgroundView
+            val glassSource = liquidGlassSource
+            view.background = if (video != null && glassSource != null)
+                LiquidGlassDrawable(view, video, glassSource, cornerPx)
+            else
+                GlassCardDrawable(cornerPx)
             pinnedIconView = view.findViewById<ImageView>(R.id.clipboard_entry_pinned_icon).apply {
                 setImageResource(pinnedIconResId)
                 setOnClickListener {
