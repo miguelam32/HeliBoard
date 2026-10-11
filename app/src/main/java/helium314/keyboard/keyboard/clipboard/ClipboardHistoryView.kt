@@ -87,6 +87,32 @@ class ClipboardHistoryView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initialize() { // needs to be delayed for access to ClipboardStrip, which is not a child of this view
+        try {
+            initializeInner()
+        } catch (t: Throwable) {
+            showCrashDialog(t)
+        }
+    }
+
+    private fun showCrashDialog(t: Throwable) {
+        val sw = java.io.StringWriter()
+        t.printStackTrace(java.io.PrintWriter(sw))
+        android.util.Log.e("ClipboardHistoryView", sw.toString())
+        val ctx = helium314.keyboard.latin.utils.getPlatformDialogThemeContext(context)
+        val tv = TextView(ctx).apply {
+            text = sw.toString()
+            setPadding(24, 24, 24, 24)
+            setTextIsSelectable(true)
+        }
+        val scroll = android.widget.ScrollView(ctx).apply { addView(tv) }
+        android.app.AlertDialog.Builder(ctx)
+            .setTitle("Error al abrir portapapeles")
+            .setView(scroll)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+    private fun initializeInner() {
         if (this::clipboardAdapter.isInitialized) return
         val colors = Settings.getValues().mColors
         clipboardAdapter = ClipboardAdapter(clipboardLayoutParams, this).apply {
