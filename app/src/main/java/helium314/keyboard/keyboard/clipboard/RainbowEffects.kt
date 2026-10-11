@@ -20,7 +20,11 @@ private val RAINBOW_COLORS = intArrayOf(
     0xFF00FFFF.toInt(), 0xFF0000FF.toInt(), 0xFF9400D3.toInt(), 0xFFFF0000.toInt()
 )
 
-/** Borde animado tipo arcoíris, pensado para botones pequeños/circulares. */
+/**
+ * Borde animado para botones pequeños/circulares: UN solo color que muta
+ * lentamente a través de todo el espectro (como un RGB de PC en modo
+ * "respiración" lento), en vez de mostrar todos los colores a la vez.
+ */
 class RainbowBorderDrawable(
     private val strokeWidthPx: Float,
     private val cornerRadiusPx: Float
@@ -31,15 +35,17 @@ class RainbowBorderDrawable(
         strokeWidth = strokeWidthPx
     }
     private val rect = RectF()
-    private var angle = 0f
     private var running = false
+    private val hsv = floatArrayOf(0f, 0.85f, 1f)
 
+    // una vuelta completa al espectro de color cada 14 segundos: lento y gradual
     private val animator = ValueAnimator.ofFloat(0f, 360f).apply {
-        duration = 2600
+        duration = 14000
         repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
         addUpdateListener {
-            angle = it.animatedValue as Float
+            hsv[0] = it.animatedValue as Float
+            paint.color = android.graphics.Color.HSVToColor(hsv)
             invalidateSelf()
         }
     }
@@ -52,13 +58,6 @@ class RainbowBorderDrawable(
 
     override fun draw(canvas: Canvas) {
         if (rect.width() <= 0f || rect.height() <= 0f) return
-        val cx = rect.centerX()
-        val cy = rect.centerY()
-        val shader = SweepGradient(cx, cy, RAINBOW_COLORS, null)
-        val matrix = Matrix()
-        matrix.postRotate(angle, cx, cy)
-        shader.setLocalMatrix(matrix)
-        paint.shader = shader
         canvas.drawRoundRect(rect, cornerRadiusPx, cornerRadiusPx, paint)
     }
 

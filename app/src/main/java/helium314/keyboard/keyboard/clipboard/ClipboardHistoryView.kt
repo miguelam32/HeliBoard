@@ -156,10 +156,6 @@ class ClipboardHistoryView @JvmOverloads constructor(
         colors.setBackground(pinAllButton, ColorType.STRIP_BACKGROUND)
         applyRainbowBorder(pinAllButton)
 
-        val divider = findViewById<View>(R.id.clipboard_header_divider)
-        val lineDrawable = RainbowLineDrawable()
-        divider.background = lineDrawable
-        lineDrawable.start()
     }
 
     private fun setupClipKey(params: KeyDrawParams) {
