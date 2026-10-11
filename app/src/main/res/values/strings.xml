@@ -569,6 +569,9 @@ language, hence "No language". -->
     <string name="customize_background_image_landscape">Set background image (landscape)</string>
     <!-- Description for customize_background_image_landscape -->
     <string name="summary_customize_background_image_landscape">If not set, portrait image will be used</string>
+    <string name="customize_background_video">Set background video</string>
+    <!-- Description for customize_background_video -->
+    <string name="summary_customize_background_video">Plays in loop behind the keys, replacing the background image</string>
     <!-- Title for customizing currencies -->
     <string name="customize_currencies">Customize currencies</string>
     <!-- Info for customizing currencies -->
