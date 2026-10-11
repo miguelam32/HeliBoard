@@ -103,6 +103,7 @@ class ClipboardAdapter(
                 isHapticFeedbackEnabled = false
             }
             Settings.getValues().mColors.setBackground(view, ColorType.KEY_BACKGROUND)
+            view.background = GlassCardDrawable(8f * view.resources.displayMetrics.density)
             pinnedIconView = view.findViewById<ImageView>(R.id.clipboard_entry_pinned_icon).apply {
                 setImageResource(pinnedIconResId)
                 setOnClickListener {
@@ -136,6 +137,8 @@ class ClipboardAdapter(
             val colors = Settings.getValues().mColors
             colors.setColor(pinnedIconView, ColorType.CLIPBOARD_PIN)
             deleteIconView.setTextColor(colors.get(ColorType.CLIPBOARD_PIN))
+            applyRainbowBorder(pinnedIconView)
+            applyRainbowBorder(deleteIconView)
         }
 
         fun setContent(historyEntry: ClipboardHistoryEntry?) {

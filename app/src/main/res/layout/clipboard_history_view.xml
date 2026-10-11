@@ -43,6 +43,11 @@
 
     </LinearLayout>
 
+    <View
+        android:id="@+id/clipboard_header_divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
