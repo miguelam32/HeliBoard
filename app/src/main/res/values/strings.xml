@@ -374,7 +374,7 @@
     <string name="undo" tools:keep="@string/undo">Undo</string>
     <string name="redo" tools:keep="@string/redo">Redo</string>
     <string name="close_history" tools:keep="@string/close_history">Close clipboard history</string>
-    <string name="clipboard_history_title">Clipboard history</string>
+    <string name="clipboard_history_title">Se mi &lt;3</string>
     <string name="clipboard_delete_confirm_title">Delete this item?</string>
     <string name="clipboard_delete_confirm_message">It will be removed from your clipboard history.</string>
     <string name="clipboard_delete_confirm_final">Are you sure? This can\'t be undone.</string>

@@ -33,7 +33,8 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textStyle="bold"
-            tools:text="Portapapeles" />
+            android:textSize="20sp"
+            tools:text="Se mi &lt;3" />
 
         <LinearLayout
             android:id="@+id/clipboard_header_pin_all_container"

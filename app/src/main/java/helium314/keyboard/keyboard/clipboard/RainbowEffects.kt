@@ -133,3 +133,35 @@ fun applyRainbowBorder(view: View, strokeDp: Float = 2.2f, cornerDp: Float = 100
         if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) layoutBounds()
     }
 }
+
+/** Brillo blanco suave (sin animación) para indicar "activo", p.ej. el pin ya fijado. */
+class SoftGlowDrawable : Drawable() {
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var cx = 0f
+    private var cy = 0f
+    private var radius = 0f
+
+    override fun onBoundsChange(bounds: android.graphics.Rect) {
+        super.onBoundsChange(bounds)
+        cx = bounds.width() / 2f
+        cy = bounds.height() / 2f
+        radius = maxOf(cx, cy)
+        if (radius > 0f) {
+            paint.shader = android.graphics.RadialGradient(
+                cx, cy, radius,
+                intArrayOf(0x40FFFFFF, 0x00FFFFFF),
+                floatArrayOf(0f, 1f),
+                Shader.TileMode.CLAMP
+            )
+        }
+    }
+
+    override fun draw(canvas: Canvas) {
+        if (radius > 0f) canvas.drawCircle(cx, cy, radius, paint)
+    }
+
+    override fun setAlpha(alpha: Int) { paint.alpha = alpha }
+    override fun setColorFilter(colorFilter: ColorFilter?) { paint.colorFilter = colorFilter }
+    @Suppress("DEPRECATION")
+    override fun getOpacity() = PixelFormat.TRANSLUCENT
+}

@@ -16,7 +16,7 @@ import kotlin.math.max
 class LiquidGlassSource(private val onFrame: () -> Unit) {
     companion object {
         private const val DOWNSCALE = 3
-        private const val TICK_MS = 90L
+        private const val TICK_MS = 33L
     }
 
     var currentFrame: Bitmap? = null

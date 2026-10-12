@@ -160,6 +160,7 @@ class ClipboardAdapter(
                 contentTextView.text = historyEntry.text?.take(1000) // truncate displayed text for performance reasons
             }
             pinnedIconView.alpha = if (isPinned) 1f else 0.35f
+            pinnedIconView.background = if (isPinned) SoftGlowDrawable() else null
             deleteIconView.visibility = View.VISIBLE
             contentImageView.visibility = if (historyEntry.filename != null) View.VISIBLE else View.GONE
             contentTextView.visibility = if (contentTextView.text.isNullOrEmpty()) View.GONE else View.VISIBLE

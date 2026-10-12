@@ -61,6 +61,17 @@ class ClipboardHistoryView @JvmOverloads constructor(
     private val liquidGlassSource = LiquidGlassSource {
         if (this::clipboardRecyclerView.isInitialized) clipboardRecyclerView.invalidate()
     }
+    private val titleColorAnimator = android.animation.ValueAnimator.ofFloat(0f, 360f).apply {
+        duration = 10000
+        repeatCount = android.animation.ValueAnimator.INFINITE
+        interpolator = android.view.animation.LinearInterpolator()
+        val hsv = floatArrayOf(0f, 0.8f, 1f)
+        addUpdateListener {
+            hsv[0] = it.animatedValue as Float
+            if (this@ClipboardHistoryView::headerTitle.isInitialized)
+                headerTitle.setTextColor(android.graphics.Color.HSVToColor(hsv))
+        }
+    }
 
     lateinit var keyboardActionListener: KeyboardActionListener
     private lateinit var clipboardHistoryManager: ClipboardHistoryManager
@@ -173,7 +184,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
             itemBackgroundId = keyBackgroundId
             itemTypeFace = params.mTypeface
             itemTextColor = params.mTextColor
-            itemTextSize = params.mLabelSize.toFloat() * 0.5f
+            itemTextSize = params.mLabelSize.toFloat() * 0.42f
         }
     }
 
@@ -186,6 +197,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
 
     private fun setupBottomRowKeyboard(editorInfo: EditorInfo, listener: KeyboardActionListener) {
         val keyboardView = findViewById<MainKeyboardView>(R.id.bottom_row_keyboard)
+        keyboardView.visibility = View.GONE
         keyboardView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         keyboardView.setKeyboardActionListener(listener)
         PointerTracker.switchTo(keyboardView)
@@ -246,6 +258,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
         }
 
         liquidGlassSource.start(videoBackgroundView)
+        titleColorAnimator.start()
 
         // absurd workaround so Android sets the correct color from stateList (depending on "activated")
         backButton.isEnabled = false; backButton.isEnabled = true
@@ -253,6 +266,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
 
     fun stopClipboardHistory() {
         liquidGlassSource.stop()
+        titleColorAnimator.cancel()
         if (!this::clipboardAdapter.isInitialized) return
         clipboardRecyclerView.adapter = null
         clipboardHistoryManager.setHistoryChangeListener(null)
