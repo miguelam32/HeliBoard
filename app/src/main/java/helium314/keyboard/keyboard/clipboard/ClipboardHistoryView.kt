@@ -130,6 +130,9 @@ class ClipboardHistoryView @JvmOverloads constructor(
         if (this::clipboardAdapter.isInitialized) return
         val colors = Settings.getValues().mColors
         videoBackgroundView = (parent as? android.view.View)?.findViewById(R.id.keyboard_video_background)
+        videoBackgroundView?.let { video ->
+            this.background = LiquidGlassDrawable(this, video, liquidGlassSource, 0f)
+        }
         clipboardAdapter = ClipboardAdapter(clipboardLayoutParams, this).apply {
             itemBackgroundId = keyBackgroundId
             pinnedIconResId = pinIconId

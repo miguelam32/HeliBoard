@@ -114,6 +114,10 @@ public final class InputView extends FrameLayout {
             frame.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             videoView.setVisibility(View.VISIBLE);
             videoView.setVideoFile(videoFile);
+            final View suggestionStripView = findViewById(R.id.suggestion_strip_view);
+            if (suggestionStripView != null) suggestionStripView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            final View emojiTabStrip = findViewById(R.id.emoji_tab_strip);
+            if (emojiTabStrip != null) emojiTabStrip.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             final android.view.ViewGroup.LayoutParams lp = videoView.getLayoutParams();
             lp.width = mMainKeyboardView.getWidth();
             lp.height = mMainKeyboardView.getHeight();
