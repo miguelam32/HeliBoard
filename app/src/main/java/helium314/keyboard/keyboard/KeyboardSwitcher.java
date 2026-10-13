@@ -225,6 +225,10 @@ public final class KeyboardSwitcher {
         mState.setLayout(LayoutDirective.Utility.CLIPBOARD);
     }
 
+    public void setStickersKeyboard() {
+        mState.setLayout(LayoutDirective.Utility.STICKERS);
+    }
+
     public boolean isImeSuppressedByHardwareKeyboard(
             @NonNull final SettingsValues settingsValues,
             @NonNull final KeyboardSwitchState toggleState) {
@@ -269,6 +273,7 @@ public final class KeyboardSwitcher {
         SYMBOLS_SHIFTED(KeyboardElement.SYMBOLS_SHIFTED),
         EMOJI(KeyboardElement.EMOJI_RECENTS),
         CLIPBOARD(KeyboardElement.CLIPBOARD),
+        STICKERS(null),
         OTHER(null);
 
         @Nullable final KeyboardElement mKeyboardElement;
@@ -680,6 +685,13 @@ public final class KeyboardSwitcher {
             mClipboardHistoryView.startClipboardHistory(mLatinIME.getClipboardHistoryManager(), mKeyboardView.getKeyVisualAttribute(),
                 mLatinIME.getCurrentInputEditorInfo(), mLatinIME.mKeyboardActionListener);
             mClipboardHistoryView.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void setStickersKeyboard() {
+            if (DEBUG_ACTION) {
+                Log.d(TAG, "setStickersKeyboard - panel aun no implementado");
+            }
         }
 
         @Override

@@ -35,6 +35,7 @@ class KeyboardState(private val switchActions: SwitchActions) {
         fun setAlphabetKeyboard(shiftMode: ShiftMode)
         fun setEmojiKeyboard()
         fun setClipboardKeyboard()
+        fun setStickersKeyboard()
         fun setNumpadKeyboard()
         fun setDpadKeyboard()
         fun setSymbolsKeyboard()
@@ -172,6 +173,7 @@ class KeyboardState(private val switchActions: SwitchActions) {
             Utility.CLIPBOARD -> switchActions.setClipboardKeyboard()
             Utility.NUMPAD -> switchActions.setNumpadKeyboard()
             Utility.DPAD -> switchActions.setDpadKeyboard()
+            Utility.STICKERS -> switchActions.setStickersKeyboard()
         }
         mode = layout.mode()
         if (layout is Alphabet) shiftMode = layout.shiftMode
@@ -505,6 +507,7 @@ class KeyboardState(private val switchActions: SwitchActions) {
         CLIPBOARD,
         NUMPAD,
         DPAD,
+        STICKERS,
     ;
         fun directive(shiftMode: ShiftMode, autoCapsFlags: Int, recapitalizeMode: RecapitalizeMode?): LayoutDirective {
             return when (this) {
@@ -515,6 +518,7 @@ class KeyboardState(private val switchActions: SwitchActions) {
                 CLIPBOARD -> Utility.CLIPBOARD
                 NUMPAD -> Utility.NUMPAD
                 DPAD -> Utility.DPAD
+                STICKERS -> Utility.STICKERS
             }
         }
     }
