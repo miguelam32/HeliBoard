@@ -122,8 +122,8 @@ public final class InputView extends FrameLayout {
             if (toolbarExpandKey != null) toolbarExpandKey.setVisibility(View.GONE);
             mMainKeyboardView.setFunctionalAndSpaceBackgroundAlpha(0);
             final android.view.ViewGroup.LayoutParams lp = videoView.getLayoutParams();
-            lp.width = mMainKeyboardView.getWidth();
-            lp.height = mMainKeyboardView.getHeight();
+            lp.width = frame.getWidth();
+            lp.height = frame.getHeight();
             videoView.setLayoutParams(lp);
         } else {
             if (videoView != null) {
