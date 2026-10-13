@@ -120,6 +120,7 @@ public final class InputView extends FrameLayout {
             if (emojiTabStrip != null) emojiTabStrip.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             final View toolbarExpandKey = findViewById(R.id.suggestions_strip_toolbar_key);
             if (toolbarExpandKey != null) toolbarExpandKey.setVisibility(View.GONE);
+            mMainKeyboardView.setFunctionalAndSpaceBackgroundAlpha(0);
             final android.view.ViewGroup.LayoutParams lp = videoView.getLayoutParams();
             lp.width = mMainKeyboardView.getWidth();
             lp.height = mMainKeyboardView.getHeight();
@@ -134,6 +135,7 @@ public final class InputView extends FrameLayout {
                 videoView.setLayoutParams(lp);
             }
             Settings.getValues().mColors.setBackground(frame, ColorType.MAIN_BACKGROUND);
+                mMainKeyboardView.setFunctionalAndSpaceBackgroundAlpha(255);
         }
 
         // Work around inset application being unreliable

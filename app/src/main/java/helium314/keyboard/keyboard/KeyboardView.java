@@ -150,6 +150,12 @@ public class KeyboardView extends View {
         setFitsSystemWindows(true);
     }
 
+    public void setFunctionalAndSpaceBackgroundAlpha(final int alpha) {
+        mFunctionalKeyBackground.setAlpha(alpha);
+        mSpacebarBackground.setAlpha(alpha);
+        invalidate();
+    }
+
     @Nullable
     public KeyVisualAttributes getKeyVisualAttribute() {
         return mKeyVisualAttributes;
