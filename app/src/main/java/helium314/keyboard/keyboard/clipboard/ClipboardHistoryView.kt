@@ -184,7 +184,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
             itemBackgroundId = keyBackgroundId
             itemTypeFace = params.mTypeface
             itemTextColor = params.mTextColor
-            itemTextSize = params.mLabelSize.toFloat() * 0.42f
+            itemTextSize = params.mLabelSize.toFloat() * 0.48f
         }
     }
 
