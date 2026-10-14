@@ -129,7 +129,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
     private fun initializeInner() {
         if (this::clipboardAdapter.isInitialized) return
         val colors = Settings.getValues().mColors
-        videoBackgroundView = (parent as? android.view.View)?.findViewById(R.id.keyboard_video_background)
+        videoBackgroundView = rootView?.findViewById(R.id.keyboard_video_background)
         clipboardAdapter = ClipboardAdapter(clipboardLayoutParams, this).apply {
             itemBackgroundId = keyBackgroundId
             pinnedIconResId = pinIconId
