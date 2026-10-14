@@ -97,6 +97,33 @@ public class KeyboardView extends View {
     private final Canvas mOffscreenCanvas = new Canvas();
     @NonNull
     private final Paint mPaint = new Paint();
+
+    // RGB sweep animation (barrido de color lento para todo el teclado)
+    private boolean mRgbAnimationRunning = false;
+    private long mRgbAnimationStartTime = 0L;
+    private static final int RGB_ANIMATION_INTERVAL_MS = 50;
+    private final Runnable mRgbAnimationTicker = new Runnable() {
+        @Override
+        public void run() {
+            invalidate();
+            if (mRgbAnimationRunning) {
+                postDelayed(this, RGB_ANIMATION_INTERVAL_MS);
+            }
+        }
+    };
+
+    // Color segun posicion X de la tecla + tiempo transcurrido (barrido de izquierda a derecha)
+    protected int getRgbSweepColor(final int keyDrawX, final int keyboardWidth) {
+        if (mRgbAnimationStartTime == 0L) mRgbAnimationStartTime = System.currentTimeMillis();
+        final long elapsed = System.currentTimeMillis() - mRgbAnimationStartTime;
+        final float speed = 0.00003f;
+        final float wavelength = 1.5f;
+        final float positionFraction = keyboardWidth > 0 ? (float) keyDrawX / keyboardWidth : 0f;
+        float hue = ((elapsed * speed) + (positionFraction * wavelength)) % 1.0f;
+        if (hue < 0) hue += 1.0f;
+        final float[] hsv = {hue * 360f, 0.85f, 1.0f};
+        return android.graphics.Color.HSVToColor(hsv);
+    }
     private final Paint.FontMetrics mFontMetrics = new Paint.FontMetrics();
 
     public KeyboardView(final Context context, final AttributeSet attrs) {
@@ -634,8 +661,18 @@ public class KeyboardView extends View {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mRgbAnimationRunning = true;
+        mRgbAnimationStartTime = 0L;
+        post(mRgbAnimationTicker);
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        mRgbAnimationRunning = false;
+        removeCallbacks(mRgbAnimationTicker);
         freeOffscreenBuffer();
     }
 
