@@ -833,7 +833,7 @@ public final class MainKeyboardView extends KeyboardView implements DrawingProxy
         } else {
             paint.clearShadowLayer();
         }
-        paint.setColor(mLanguageOnSpacebarTextColor);
+        paint.setColor(getRgbSweepColor(key.getDrawX(), getWidth()));
         paint.setAlpha(mLanguageOnSpacebarAnimAlpha);
         if (!fitsTextIntoWidth(width, spaceText, paint)) {
             final float textWidth = TypefaceUtils.getStringWidth(spaceText, paint);

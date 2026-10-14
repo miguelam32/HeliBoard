@@ -583,6 +583,8 @@ public class KeyboardView extends View {
                 : (keyHeight - iconHeight) / 2; // Align vertically center.
             int iconX = (keyWidth - iconWidth) / 2; // Align horizontally center.
             setKeyIconColor(key, icon, keyboard);
+            icon.setColorFilter(new android.graphics.PorterDuffColorFilter(
+                    getRgbSweepColor(key.getDrawX(), getWidth()), android.graphics.PorterDuff.Mode.SRC_IN));
             drawIcon(canvas, icon, iconX, iconY, iconWidth, iconHeight);
         }
     }
