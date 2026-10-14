@@ -54,6 +54,10 @@ public final class InputView extends FrameLayout {
         mKeyboardTopPaddingForwarder.setKeyboardTopPadding(keyboardTopPadding);
     }
 
+    public void refreshBackgroundTransparency() {
+        onNextLayout(this);
+    }
+
     @Override
     protected boolean dispatchHoverEvent(final MotionEvent event) {
         if (AccessibilityUtils.Companion.getInstance().isTouchExplorationEnabled()

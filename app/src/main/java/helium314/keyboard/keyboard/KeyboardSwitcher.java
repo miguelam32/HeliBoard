@@ -380,6 +380,7 @@ public final class KeyboardSwitcher {
         } else if (wasClipboard) {
             setClipboardKeyboard();
         }
+        if (mCurrentInputView != null) mCurrentInputView.refreshBackgroundTransparency();
     }
 
     /**
