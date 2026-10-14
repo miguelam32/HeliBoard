@@ -179,6 +179,7 @@ public class KeyboardView extends View {
 
     public void setFunctionalAndSpaceBackgroundAlpha(final int alpha) {
         mFunctionalKeyBackground.setAlpha(alpha);
+        mActionKeyBackground.setAlpha(alpha);
         mSpacebarBackground.setAlpha(alpha);
         invalidate();
     }
