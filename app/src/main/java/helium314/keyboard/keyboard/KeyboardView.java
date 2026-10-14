@@ -117,7 +117,7 @@ public class KeyboardView extends View {
         if (mRgbAnimationStartTime == 0L) mRgbAnimationStartTime = System.currentTimeMillis();
         final long elapsed = System.currentTimeMillis() - mRgbAnimationStartTime;
         final float speed = 0.00003f;
-        final float wavelength = 1.5f;
+        final float wavelength = 0.8f;
         final float positionFraction = keyboardWidth > 0 ? (float) keyDrawX / keyboardWidth : 0f;
         float hue = ((elapsed * speed) + (positionFraction * wavelength)) % 1.0f;
         if (hue < 0) hue += 1.0f;
@@ -375,8 +375,6 @@ public class KeyboardView extends View {
         if (!key.isSpacer()) {
             final Drawable background = key.selectBackgroundDrawable(
                     mKeyBackground, mFunctionalKeyBackground, mSpacebarBackground, mActionKeyBackground);
-            background.setColorFilter(new android.graphics.PorterDuffColorFilter(
-                    getRgbSweepColor(keyDrawX, getWidth()), android.graphics.PorterDuff.Mode.MULTIPLY));
             onDrawKeyBackground(key, canvas, background);
         }
         onDrawKeyTopVisuals(key, canvas, paint, params);
@@ -486,6 +484,7 @@ public class KeyboardView extends View {
             blendAlpha(paint, params.mAnimAlpha);
             if (!(this instanceof EmojiPageKeyboardView) && !(this instanceof PopupKeysKeyboardView)) {
                 paint.setColor(getRgbSweepColor(key.getDrawX(), getWidth()));
+                paint.setShadowLayer(6f, 0f, 0f, paint.getColor());
             }
             canvas.drawText(label, 0, label.length(), labelX, labelBaseline, paint);
             // Turn off drop shadow and reset x-scale.
