@@ -134,6 +134,41 @@ fun applyRainbowBorder(view: View, strokeDp: Float = 2.2f, cornerDp: Float = 100
     }
 }
 
+/**
+ * Tine el icono completo de un boton del toolbar con el mismo barrido RGB del teclado
+ * principal (letras/fondo), sincronizado en velocidad para que se vea como una sola ola.
+ * keyIndex/totalKeys ubican este boton dentro de la fila (0..totalKeys-1).
+ */
+fun applyRgbSweepTint(view: android.widget.ImageView, keyIndex: Int, totalKeys: Int) {
+    var running = true
+    val startTime = System.currentTimeMillis()
+    val ticker = object : Runnable {
+        override fun run() {
+            if (!running) return
+            val elapsed = System.currentTimeMillis() - startTime
+            val speed = 0.00003f
+            val wavelength = 0.8f
+            val positionFraction = if (totalKeys > 1) keyIndex.toFloat() / totalKeys else 0f
+            var hue = ((elapsed * speed) + (positionFraction * wavelength)) % 1.0f
+            if (hue < 0) hue += 1.0f
+            val hsv = floatArrayOf(hue * 360f, 0.85f, 1.0f)
+            view.setColorFilter(android.graphics.Color.HSVToColor(hsv))
+            view.postDelayed(this, 50)
+        }
+    }
+    view.post(ticker)
+    view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View) {
+            running = true
+            view.post(ticker)
+        }
+        override fun onViewDetachedFromWindow(v: View) {
+            running = false
+            view.removeCallbacks(ticker)
+        }
+    })
+}
+
 /** Brillo blanco suave (sin animación) para indicar "activo", p.ej. el pin ya fijado. */
 class SoftGlowDrawable : Drawable() {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
