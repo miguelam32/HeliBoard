@@ -175,7 +175,6 @@ class ClipboardHistoryView @JvmOverloads constructor(
         pinAllContainer.addView(pinAllButton)
         colors.setColor(pinAllButton, ColorType.CLIPBOARD_PIN)
         colors.setBackground(pinAllButton, ColorType.STRIP_BACKGROUND)
-        applyRainbowBorder(pinAllButton)
 
     }
 

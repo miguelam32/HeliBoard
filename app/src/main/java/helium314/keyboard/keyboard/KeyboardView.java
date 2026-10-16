@@ -485,7 +485,8 @@ public class KeyboardView extends View {
             blendAlpha(paint, params.mAnimAlpha);
             if (!(this instanceof EmojiPageKeyboardView) && !(this instanceof PopupKeysKeyboardView)) {
                 paint.setColor(getRgbSweepColor(key.getDrawX(), getWidth()));
-                paint.setShadowLayer(6f, 0f, 0f, paint.getColor());
+                final float glowPulse = 6f + (float) Math.sin(System.currentTimeMillis() * 0.0015) * 1.5f;
+                paint.setShadowLayer(glowPulse, 0f, 0f, paint.getColor());
             }
             canvas.drawText(label, 0, label.length(), labelX, labelBaseline, paint);
             // Turn off drop shadow and reset x-scale.
