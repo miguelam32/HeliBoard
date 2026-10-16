@@ -145,6 +145,8 @@ class ClipboardAdapter(
             clipboardLayoutParams.setItemProperties(view)
             val colors = Settings.getValues().mColors
             colors.setColor(pinnedIconView, ColorType.CLIPBOARD_PIN)
+            applyRgbSweepTint(pinnedIconView, bindingAdapterPosition.coerceAtLeast(0), 10)
+            applyRgbSweepTint(deleteIconView, bindingAdapterPosition.coerceAtLeast(0) + 1, 10)
             deleteIconView.setTextColor(colors.get(ColorType.CLIPBOARD_PIN))
         }
 

@@ -160,6 +160,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
         backButton.setOnLongClickListener(this@ClipboardHistoryView)
         colors.setColor(backButton, ColorType.TOOL_BAR_KEY)
         colors.setBackground(backButton, ColorType.STRIP_BACKGROUND)
+        applyRgbSweepTint(backButton, 0, 2)
 
         val pinAllContainer = findViewById<LinearLayout>(R.id.clipboard_header_pin_all_container)
         pinAllButton = ImageButton(context, null, R.attr.suggestionWordStyle).apply {
@@ -175,6 +176,7 @@ class ClipboardHistoryView @JvmOverloads constructor(
         pinAllContainer.addView(pinAllButton)
         colors.setColor(pinAllButton, ColorType.CLIPBOARD_PIN)
         colors.setBackground(pinAllButton, ColorType.STRIP_BACKGROUND)
+        applyRgbSweepTint(pinAllButton, 1, 2)
 
     }
 
